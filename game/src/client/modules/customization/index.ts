@@ -60,6 +60,47 @@ let isCameraInterpolating: boolean;
 
 let PED_TATTOOS: TattooList = {};
 
+// ── Preview hold ──────────────────────────────────────────────────────────────
+// The live preview sets components/props locally, but on some server setups the
+// ped's clothing gets re-asserted to the last COMMITTED look until you save,
+// which reads as the preview flickering between the old and new dress. We keep
+// the DESIRED look (updated on every change) and re-assert it each frame while
+// the menu is open, so what you picked always wins.
+const previewComponents: Record<number, { component_id: number; drawable: number; texture: number }> = {};
+const previewProps: Record<number, { prop_id: number; drawable: number; texture: number }> = {};
+let previewActive = false;
+let previewTick = 0;
+
+function seedPreview(ped: number): void {
+  for (const id of PED_COMPONENTS_IDS) {
+    previewComponents[id] = {
+      component_id: id,
+      drawable: GetPedDrawableVariation(ped, id),
+      texture: GetPedTextureVariation(ped, id),
+    };
+  }
+  for (const id of PED_PROPS_IDS) {
+    previewProps[id] = {
+      prop_id: id,
+      drawable: GetPedPropIndex(ped, id),
+      texture: GetPedPropTextureIndex(ped, id),
+    };
+  }
+}
+
+// Re-seed after a model swap (component/prop state differs per model).
+export function reseedPreview(): void {
+  seedPreview(PlayerPedId());
+}
+
+export function trackPreviewComponent(c: { component_id: number; drawable: number; texture: number }): void {
+  previewComponents[c.component_id] = c;
+}
+
+export function trackPreviewProp(p: { prop_id: number; drawable: number; texture: number }): void {
+  previewProps[p.prop_id] = p;
+}
+
 function getRgbColors(): { hair: number[][]; makeUp: number[][] } {
   const colors = {
     hair: [],
@@ -381,6 +422,48 @@ export async function rotateCamera(direction: 'left' | 'right'): Promise<void> {
   }, 500);
 }
 
+// Free drag-rotate: spin the ped by a heading delta (degrees) from the UI drag.
+// Smooth, slow drag-rotate. The UI feeds heading deltas into a TARGET; a tick
+// eases the ped toward it (no per-move ClearPedTasks/TaskStandStill churn, which
+// was restarting the idle pose and making the ped jitter/flicker).
+let rotTarget: number | null = null;
+let rotTick = 0;
+
+export function rotatePed(delta: number): void {
+  const ped = PlayerPedId();
+  if (rotTarget === null) rotTarget = GetEntityHeading(ped);
+  rotTarget = (rotTarget - delta + 360.0) % 360.0;
+
+  if (!rotTick) {
+    rotTick = setTick(() => {
+      if (rotTarget === null) {
+        clearTick(rotTick);
+        rotTick = 0;
+        return;
+      }
+      const p = PlayerPedId();
+      const cur = GetEntityHeading(p);
+      let diff = ((rotTarget - cur + 540.0) % 360.0) - 180.0;
+      if (Math.abs(diff) < 0.15) {
+        SetEntityHeading(p, rotTarget);
+        rotTarget = null;
+        clearTick(rotTick);
+        rotTick = 0;
+        return;
+      }
+      SetEntityHeading(p, (cur + diff * 0.12 + 360.0) % 360.0); // ease 12%/frame — slow + smooth
+    });
+  }
+}
+
+export function stopRotatePed(): void {
+  rotTarget = null;
+  if (rotTick) {
+    clearTick(rotTick);
+    rotTick = 0;
+  }
+}
+
 export function pedTurnAround(ped: number): void {
   reverseCamera = !reverseCamera;
 
@@ -555,6 +638,44 @@ function startPlayerCustomization(
   SetEntityInvincible(playerPed, true);
   TaskStandStill(playerPed, -1);
 
+  // Hold the desired clothing so the preview can't revert to the committed look
+  // while you change it. CRITICAL: only re-apply a component when it has actually
+  // DRIFTED from what we want — calling SetPedComponentVariation every frame
+  // forces the game to reload the drawable each frame, which is ITSELF a flicker.
+  // Compare-then-set corrects a genuine revert without the per-frame reload.
+  seedPreview(playerPed);
+  previewActive = true;
+  previewTick = setTick(() => {
+    if (!previewActive) {
+      clearTick(previewTick);
+      previewTick = 0;
+      return;
+    }
+    const ped = PlayerPedId();
+
+    for (const id in previewComponents) {
+      const c = previewComponents[id];
+      if (
+        GetPedDrawableVariation(ped, c.component_id) !== c.drawable ||
+        GetPedTextureVariation(ped, c.component_id) !== c.texture
+      ) {
+        SetPedComponentVariation(ped, c.component_id, c.drawable, c.texture, 0);
+      }
+    }
+
+    for (const id in previewProps) {
+      const p = previewProps[id];
+      if (p.drawable < 0) {
+        if (GetPedPropIndex(ped, p.prop_id) !== -1) ClearPedProp(ped, p.prop_id);
+      } else if (
+        GetPedPropIndex(ped, p.prop_id) !== p.drawable ||
+        GetPedPropTextureIndex(ped, p.prop_id) !== p.texture
+      ) {
+        SetPedPropIndex(ped, p.prop_id, p.drawable, p.texture, true);
+      }
+    }
+  });
+
   const nuiMessage = {
     type: 'appearance_display',
     payload: {},
@@ -564,6 +685,8 @@ function startPlayerCustomization(
 }
 
 export function exitPlayerCustomization(appearance?: PedAppearance): void {
+  previewActive = false;   // stop holding the preview
+  stopRotatePed();
   RenderScriptCams(false, false, 0, true, true);
   DestroyCam(cameraHandle, false);
   DisplayRadar(true);

@@ -21,8 +21,8 @@
     "noEmit": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "jsx": "react-jsx", 
-    "types": ["react/next"]
+    "jsx": "react-jsx",
+    "types": ["react", "react-dom", "styled-components", "react-select"]
   },
   "include": [
     "src"

@@ -7,19 +7,20 @@ interface ItemProps {
 }
 
 const Container = styled.div`
-  margin-top: 0.5rem;
-
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
+  padding: 10px 11px;
+  border-radius: 7px;
+  background: var(--spz-card);
+  border: 1px solid var(--spz-border);
 
-  padding: 10px;
-  border-radius: 2px;
-
-  background: rgba(0, 0, 0, 0.3);
-
-  span {
-    color: #fff;
-    font-size: 14px;
+  > span {
+    color: var(--spz-dim);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
 `;
 
@@ -27,13 +28,10 @@ const Inputs = styled.div`
   width: 100%;
   display: inline-flex;
   flex-wrap: wrap;
-
-  margin-top: 10px;
+  margin-top: 9px;
 
   > div {
-    & + div {
-      margin-top: 10px;
-    }
+    & + div { margin-top: 10px; }
   }
 `;
 

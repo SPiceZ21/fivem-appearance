@@ -3,9 +3,10 @@ node_modules/
 yarn.lock
 
 game/node_modules/
-game/dist/
 game/yarn.lock
 
 web/node_modules/
-web/dist/
 web/yarn.lock
+
+# NOTE: game/dist and web/dist are intentionally COMMITTED — the txAdmin recipe
+# clones this repo as-is (no build step), so the built bundles must be tracked.

@@ -3,9 +3,7 @@ import styled from 'styled-components';
 export const Wrapper = styled.div`
   width: 100vw;
   height: 100vh;
-
   position: absolute;
-
   left: 0;
   top: 0;
 
@@ -13,20 +11,25 @@ export const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8px;
 
   user-select: none;
-
-  font-size: 1.5rem;
-  color: rgba(255, 255, 255, 1);
   text-align: center;
-  text-transform: uppercase;
-  text-shadow: 3px 3px rgba(0, 0, 0, 0.5);
+  background: rgba(6, 7, 9, 0.72);
 
-  background: rgba(0, 0, 0, 0.9);
+  /* the content reads as a floating card in the middle */
+  p {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--spz-text);
+  }
 
   span {
-    font-size: 1rem;
-    opacity: 0.5;
+    font-size: 13px;
+    color: var(--spz-dim);
+    max-width: 360px;
   }
 `;
 
@@ -34,33 +37,40 @@ export const Buttons = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
-  margin-top: 100px;
+  gap: 12px;
+  margin-top: 26px;
 
   button {
     height: 40px;
-    width: 100px;
-    margin: 0 50px;
+    min-width: 120px;
+    padding: 0 22px;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    color: #fff;
-    font-size: 1.5rem;
-    font-weight: 400;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
+    border-radius: 8px;
+    transition: all 0.15s;
+    border: 1px solid var(--spz-border);
+    background: transparent;
+    color: var(--spz-dim);
+  }
 
-    opacity: 0.8;
-    transition: all 0.1s;
+  /* accept = primary */
+  button:first-child {
+    background: var(--spz-accent);
+    border-color: var(--spz-accent);
+    color: #150a00;
 
-    background: none;
-    border: 0;
+    &:hover { filter: brightness(1.08); }
+  }
 
-    &:hover {
-      transform: scale(1.1);
-      opacity: 1;
-      text-shadow: 0px 2px 2px rgba(251, 255, 190, 0.2);
-    }
+  button:last-child:hover {
+    color: var(--spz-text);
+    border-color: rgba(255, 255, 255, 0.2);
   }
 `;

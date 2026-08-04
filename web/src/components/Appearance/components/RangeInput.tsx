@@ -16,23 +16,24 @@ const Container = styled.div`
 
   > span {
     width: 100%;
-
     display: flex;
     justify-content: space-between;
-    font-weight: 200;
+    font-size: 11px;
+    color: var(--spz-dim);
+
+    small { font-family: var(--spz-mono); font-size: 10px; }
   }
 
   > div {
     display: flex;
     align-items: center;
-
     position: relative;
-
-    margin-top: 10px;
+    margin-top: 9px;
 
     > small {
-      font-weight: 200;
       font-size: 8px;
+      color: var(--spz-mute);
+      font-family: var(--spz-mono);
     }
   }
 
@@ -40,22 +41,23 @@ const Container = styled.div`
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 15px;
-    background: rgba(0, 0, 0, 0.8);
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
     outline: none;
     opacity: 1;
-    border-radius: 2px;
+    border-radius: 99px;
     margin: 0 10px;
   }
 
   input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 17px;
-    height: 17px;
-    background: #eeeeee;
+    width: 14px;
+    height: 14px;
+    background: var(--spz-accent);
     cursor: pointer;
-    border-radius: 2px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 102, 0, 0.5);
   }
 `;
 

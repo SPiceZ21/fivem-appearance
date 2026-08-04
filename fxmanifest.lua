@@ -13,7 +13,12 @@ files {
   'web/dist/assets/*.js',
   'locales/*.json',
   'peds.json',
-  'tattoos.json'
+  'tattoos.json',
+  -- Auto-generated clothing/prop thumbnails (spz-appearance /autoshot writes
+  -- here; ThumbGrid loads them over cfx-nui). Kept OUTSIDE web/dist so a UI
+  -- rebuild never wipes them.
+  'images/clothing/*.png',
+  'images/props/*.png'
 }
 
 ui_page 'web/dist/index.html'

@@ -5,6 +5,7 @@ import {
   getComponentSettings,
   getPropSettings,
   pedTurnAround,
+  rotatePed,
   setCamera,
   rotateCamera,
   exitPlayerCustomization,
@@ -14,6 +15,9 @@ import {
   removePedTattoo,
   wearClothes,
   removeClothes,
+  trackPreviewComponent,
+  trackPreviewProp,
+  reseedPreview,
 } from './index';
 
 import {
@@ -33,6 +37,7 @@ export function registerNuiCallbacks(): void {
   RegisterNuiCallbackType('appearance_get_settings_and_data');
   RegisterNuiCallbackType('appearance_set_camera');
   RegisterNuiCallbackType('appearance_turn_around');
+  RegisterNuiCallbackType('appearance_rotate_ped');
   RegisterNuiCallbackType('appearance_rotate_camera');
   RegisterNuiCallbackType('appearance_change_model');
   RegisterNuiCallbackType('appearance_change_head_blend');
@@ -78,6 +83,11 @@ export function registerNuiCallbacks(): void {
     pedTurnAround(PlayerPedId());
   });
 
+  on('__cfx_nui:appearance_rotate_ped', (delta: number, cb: (arg: any) => void): void => {
+    cb({});
+    rotatePed(delta);
+  });
+
   on(
     '__cfx_nui:appearance_rotate_camera',
     (direction: 'left' | 'right', cb: (arg: any) => void): void => {
@@ -97,6 +107,8 @@ export function registerNuiCallbacks(): void {
       SetEntityInvincible(playerPed, true);
       TaskStandStill(playerPed, -1);
 
+      reseedPreview();   // new model → refresh the held preview state
+
       const appearanceData = getPedAppearance(playerPed);
       const appearanceSettings = getAppearanceSettings();
 
@@ -109,6 +121,7 @@ export function registerNuiCallbacks(): void {
     (component: PedComponent, cb: (arg: any) => void): void => {
       const playerPed = PlayerPedId();
       setPedComponent(playerPed, component);
+      trackPreviewComponent(component);   // hold this pick each frame
       cb(getComponentSettings(playerPed, component.component_id));
     },
   );
@@ -116,6 +129,7 @@ export function registerNuiCallbacks(): void {
   on('__cfx_nui:appearance_change_prop', (prop: PedProp, cb: (arg: any) => void): void => {
     const playerPed = PlayerPedId();
     setPedProp(playerPed, prop);
+    trackPreviewProp(prop);   // hold this pick each frame
     cb(getPropSettings(playerPed, prop.prop_id));
   });
 
@@ -177,13 +191,13 @@ export function registerNuiCallbacks(): void {
     (dataWearClothes: WearClothes, cb: (arg: any) => void): void => {
       cb({});
       const { data, key } = dataWearClothes;
-      wearClothes(data, key);
+      wearClothes(data, key).then(reseedPreview);   // hold the worn look
     },
   );
 
   on('__cfx_nui:appearance_remove_clothes', (clothes: string, cb: (arg: any) => void): void => {
     cb({});
-    removeClothes(clothes);
+    removeClothes(clothes).then(reseedPreview);
   });
 
   on('__cfx_nui:appearance_save', (appearance: PedAppearance, cb: (arg: any) => void): void => {
