@@ -1,6 +1,7 @@
+import { useState } from 'react';
+import styled from 'styled-components';
 import { useNuiState } from '../../hooks/nuiState';
 
-import Section from './components/Section';
 import Item from './components/Item';
 import Input from './components/Input';
 import ThumbGrid from './components/ThumbGrid';
@@ -30,6 +31,49 @@ const PROP_ITEMS: { id: number; key: string }[] = [
   { id: 7, key: 'bracelets' },
 ];
 
+const Row = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+`;
+
+const GridCol = styled.div`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const Menu = styled.div`
+  width: 128px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const SlotBtn = styled.button<{ active: boolean }>`
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 7px;
+  border: 1px solid ${({ active }) => (active ? 'var(--spz-border-hi)' : 'var(--spz-border)')};
+  background: ${({ active }) => (active ? 'var(--spz-accent-soft)' : 'var(--spz-card)')};
+  color: ${({ active }) => (active ? 'var(--spz-accent)' : 'var(--spz-dim)')};
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  transition: all 0.15s;
+
+  &:hover {
+    color: ${({ active }) => (active ? 'var(--spz-accent)' : 'var(--spz-text)')};
+    border-color: ${({ active }) => (active ? 'var(--spz-border-hi)' : 'rgba(255,255,255,0.2)')};
+  }
+`;
+
 const Props = ({
   settings,
   data,
@@ -39,6 +83,7 @@ const Props = ({
   handlePropTextureChange,
 }: PropsProps) => {
   const { locales } = useNuiState();
+  const [slot, setSlot] = useState(PROP_ITEMS[0].id);
 
   const settingsById = settings.reduce((object, { prop_id, drawable, texture }) => {
     return { ...object, [prop_id]: { drawable, texture } };
@@ -52,43 +97,50 @@ const Props = ({
     return { ...object, [prop_id]: { drawable, texture } };
   }, {} as DataById<Omit<PedProp, 'prop_id'>>);
 
-  if (!locales) {
-    return null;
-  }
+  if (!locales) return null;
+
+  const slots = PROP_ITEMS.filter(s => settingsById[s.id] && propsById[s.id]);
+  const active = slots.some(s => s.id === slot) ? slot : slots[0]?.id;
+  if (active == null) return null;
+
+  const id = active;
+  const imageFor =
+    PROPS_IMAGE_BASE && model
+      ? (v: number) => `${PROPS_IMAGE_BASE}${model}_p${id}_${v}.jpg`
+      : undefined;
 
   return (
-    <Section title={locales.props.title}>
-      {PROP_ITEMS.map(({ id, key }) => {
-        if (!settingsById[id] || !propsById[id]) return null;
+    <Row>
+      <GridCol>
+        <ThumbGrid
+          label={(locales.props as any)[PROP_ITEMS.find(s => s.id === id)!.key]}
+          min={settingsById[id].drawable.min}
+          max={settingsById[id].drawable.max}
+          value={propsById[id].drawable}
+          storedValue={storedPropsById[id]?.drawable}
+          onSelect={v => handlePropDrawableChange(id, v)}
+          imageFor={imageFor}
+        />
+        <Item title={locales.props.texture}>
+          <Input
+            title={locales.props.texture}
+            min={settingsById[id].texture.min}
+            max={settingsById[id].texture.max}
+            defaultValue={propsById[id].texture}
+            clientValue={storedPropsById[id]?.texture}
+            onChange={value => handlePropTextureChange(id, value)}
+          />
+        </Item>
+      </GridCol>
 
-        const imageFor =
-          PROPS_IMAGE_BASE && model
-            ? (v: number) => `${PROPS_IMAGE_BASE}${model}_p${id}_${v}.png`
-            : undefined;
-
-        return (
-          <Item key={id} title={(locales.props as any)[key]}>
-            <ThumbGrid
-              label={locales.props.drawable}
-              min={settingsById[id].drawable.min}
-              max={settingsById[id].drawable.max}
-              value={propsById[id].drawable}
-              storedValue={storedPropsById[id]?.drawable}
-              onSelect={v => handlePropDrawableChange(id, v)}
-              imageFor={imageFor}
-            />
-            <Input
-              title={locales.props.texture}
-              min={settingsById[id].texture.min}
-              max={settingsById[id].texture.max}
-              defaultValue={propsById[id].texture}
-              clientValue={storedPropsById[id]?.texture}
-              onChange={value => handlePropTextureChange(id, value)}
-            />
-          </Item>
-        );
-      })}
-    </Section>
+      <Menu>
+        {slots.map(s => (
+          <SlotBtn key={s.id} active={s.id === active} onClick={() => setSlot(s.id)}>
+            {(locales.props as any)[s.key]}
+          </SlotBtn>
+        ))}
+      </Menu>
+    </Row>
   );
 };
 

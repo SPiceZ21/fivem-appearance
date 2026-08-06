@@ -17,8 +17,8 @@ files {
   -- Auto-generated clothing/prop thumbnails (spz-appearance /autoshot writes
   -- here; ThumbGrid loads them over cfx-nui). Kept OUTSIDE web/dist so a UI
   -- rebuild never wipes them.
-  'images/clothing/*.png',
-  'images/props/*.png'
+  'images/clothing/*.jpg',
+  'images/props/*.jpg'
 }
 
 ui_page 'web/dist/index.html'

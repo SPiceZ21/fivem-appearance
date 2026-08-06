@@ -34,11 +34,11 @@ const Head = styled.div`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
-  gap: 5px;
-  max-height: 188px;
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  gap: 6px;
+  max-height: 320px;
   overflow-y: auto;
-  padding-right: 2px;
+  padding-right: 3px;
 `;
 
 const Tile = styled.button<{ selected: boolean; stored: boolean }>`
@@ -63,7 +63,7 @@ const Tile = styled.button<{ selected: boolean; stored: boolean }>`
     align-items: center;
     justify-content: center;
     font-family: var(--spz-mono);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: ${({ selected }) => (selected ? 'var(--spz-accent)' : 'var(--spz-dim)')};
   }

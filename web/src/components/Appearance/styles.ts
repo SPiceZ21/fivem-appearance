@@ -13,11 +13,11 @@ export const Wrapper = styled.div`
    own module box, matching the rest of the SPiceZ UIs. */
 export const Panel = styled.div`
   height: 100vh;
-  width: 400px;
+  width: 600px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 16px 14px;
+  padding: 16px 15px;
   background: transparent;
 `;
 
@@ -121,7 +121,7 @@ export const DragLayer = styled.div`
   position: fixed;
   top: 0;
   bottom: 0;
-  left: 400px;
+  left: 600px;
   right: 0;
   cursor: grab;
   &:active { cursor: grabbing; }
