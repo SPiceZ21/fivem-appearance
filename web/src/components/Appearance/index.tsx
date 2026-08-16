@@ -674,7 +674,6 @@ const Appearance = () => {
                         settings={appearanceSettings.components}
                         data={data.components}
                         storedData={storedData.components}
-                        model={data.model}
                         handleComponentDrawableChange={handleComponentDrawableChange}
                         handleComponentTextureChange={handleComponentTextureChange}
                       />
@@ -685,7 +684,6 @@ const Appearance = () => {
                         settings={appearanceSettings.props}
                         data={data.props}
                         storedData={storedData.props}
-                        model={data.model}
                         handlePropDrawableChange={handlePropDrawableChange}
                         handlePropTextureChange={handlePropTextureChange}
                       />
