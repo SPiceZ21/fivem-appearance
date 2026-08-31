@@ -28,78 +28,61 @@ const Container = styled.div`
   }
 `;
 
+const PANEL = 'rgba(20, 21, 26, 0.98)';
+
 const customStyles: any = {
-  control: (styles: any) => ({
+  control: (styles: any, { isFocused }: any) => ({
     ...styles,
-    marginTop: '10px',
-    background: 'rgba(0, 0, 0, 0.8)',
-    fontSize: '14px',
-    color: '#fff',
-    border: 'none',
+    minHeight: '36px',
+    background: 'rgba(0, 0, 0, 0.35)',
+    fontSize: '13px',
+    color: '#f0f0f4',
+    border: `1px solid ${isFocused ? 'rgba(255, 102, 0, 0.5)' : 'rgba(255, 255, 255, 0.08)'}`,
+    borderRadius: '7px',
     outline: 'none',
-    boxShadow: 'none',
+    boxShadow: isFocused ? '0 0 10px rgba(255, 102, 0, 0.15)' : 'none',
+    '&:hover': { borderColor: 'rgba(255,255,255,0.2)' },
   }),
-  placeholder: (styles: any) => ({
-    ...styles,
-    fontSize: '14px',
-    color: '#fff',
-  }),
-  input: (styles: any) => ({
-    ...styles,
-    fontSize: '14px',
-    color: '#fff',
-  }),
+  placeholder: (styles: any) => ({ ...styles, fontSize: '13px', color: '#9a9aa5' }),
+  input: (styles: any) => ({ ...styles, fontSize: '13px', color: '#f0f0f4' }),
   singleValue: (styles: any) => ({
     ...styles,
-    fontSize: '14px',
-    color: '#fff',
+    fontSize: '13px',
+    fontWeight: '600',
+    color: '#f0f0f4',
     border: 'none',
     outline: 'none',
   }),
-  indicatorContainer: (styles: any) => ({
-    ...styles,
-    borderColor: '#fff',
-    color: '#fff',
-  }),
-  dropdownIndicator: (styles: any) => ({
-    ...styles,
-    borderColor: '#fff',
-    color: '#fff',
-  }),
-  menuPortal: (styles: any) => ({
-    ...styles,
-    color: '#fff',
-    zIndex: 9999,
-  }),
+  indicatorSeparator: (styles: any) => ({ ...styles, background: 'rgba(255,255,255,0.1)' }),
+  dropdownIndicator: (styles: any) => ({ ...styles, color: '#9a9aa5' }),
+  menuPortal: (styles: any) => ({ ...styles, zIndex: 9999 }),
   menu: (styles: any) => ({
     ...styles,
-    background: 'rgba(0, 0, 0, 0.8)',
+    background: PANEL,
+    border: '1px solid rgba(255,255,255,0.12)',
     position: 'absolute',
     marginBottom: '10px',
-    borderRadius: '4px',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
   }),
   menuList: (styles: any) => ({
     ...styles,
-    background: 'rgba(0, 0, 0, 0.8)',
-    borderRadius: '4px',
-    '&::-webkit-scrollbar': {
-      width: '10px',
-    },
-    '&::-webkit-scrollbar-track': {
-      background: 'none',
-    },
-    '&::-webkit-scrollbar-thumb': {
-      borderRadius: '4px',
-      background: '#fff',
-    },
+    background: PANEL,
+    borderRadius: '8px',
+    padding: '4px',
+    '&::-webkit-scrollbar': { width: '6px' },
+    '&::-webkit-scrollbar-track': { background: 'none' },
+    '&::-webkit-scrollbar-thumb': { borderRadius: '3px', background: 'rgba(255,255,255,0.15)' },
   }),
-  option: (styles: any, { isFocused }: any) => ({
+  option: (styles: any, { isFocused, isSelected }: any) => ({
     ...styles,
-    borderRadius: '4px',
-    width: '97%',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    background: isFocused ? 'rgba(255, 255, 255, 0.1)' : 'none',
+    fontSize: '13px',
+    borderRadius: '5px',
+    color: isSelected ? '#ff6600' : '#f0f0f4',
+    background: isFocused ? 'rgba(255, 102, 0, 0.14)' : 'transparent',
+    cursor: 'pointer',
+    fontWeight: isSelected ? '700' : '500',
   }),
 };
 

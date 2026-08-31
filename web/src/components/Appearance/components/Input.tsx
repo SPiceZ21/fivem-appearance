@@ -11,69 +11,90 @@ interface InputProps {
   onChange: (value: number) => void;
 }
 
-const Container = styled.div`
+const Container = styled.div<{ hasTitle: boolean }>`
   min-width: 0;
-
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-
-  margin-top: ${({ title }) => (title ? '5px' : '0')};
+  margin-top: ${({ hasTitle }) => (hasTitle ? '6px' : '0')};
 
   > span {
     width: 100%;
-
     display: flex;
     justify-content: space-between;
-    font-weight: 200;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--spz-dim);
+    margin-bottom: 6px;
+
+    .title-text {
+      color: var(--spz-text);
+      letter-spacing: 0.02em;
+    }
+
+    .saved-badge {
+      font-family: var(--spz-mono);
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--spz-mute);
+    }
   }
 
-  > div {
+  .input-controls {
     min-width: 0;
-    height: 30px;
-
+    height: 34px;
     display: flex;
     align-items: center;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--spz-border);
+    border-radius: 7px;
+    padding: 2px;
+    transition: border-color 0.15s, box-shadow 0.15s;
 
-    margin-top: 10px;
+    &:focus-within {
+      border-color: var(--spz-border-hi);
+      box-shadow: 0 0 10px rgba(255, 102, 0, 0.15);
+    }
 
     button {
       height: 100%;
-      min-width: 30px;
-
+      width: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-
-      color: #fff;
-
-      outline: 0;
+      color: var(--spz-dim);
       border: none;
-      border-radius: 2px;
-
-      background: rgba(0, 0, 0, 0.5);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.04);
+      transition: all 0.15s;
+      flex-shrink: 0;
 
       &:hover {
-        background: rgba(0, 0, 0);
+        background: var(--spz-accent-soft);
+        color: var(--spz-accent);
+      }
+
+      &:active {
+        transform: scale(0.92);
       }
     }
 
     input {
       min-width: 0;
       height: 100%;
-
-      flex-grow: 1;
-      flex-shrink: 1;
-
+      flex: 1;
       text-align: center;
-      font-size: 14px;
-      color: #fff;
-
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--spz-mono);
+      color: var(--spz-text);
       border: none;
-      border-radius: 2px;
-      margin: 0 2px;
-
-      background: rgba(0, 0, 0, 0.8);
+      background: transparent;
+      outline: none;
 
       &::-webkit-outer-spin-button,
       &::-webkit-inner-spin-button {
@@ -117,7 +138,7 @@ const Input: React.FC<InputProps> = ({ title, min = 0, max = 255, defaultValue, 
       if (Number.isNaN(_value)) return;
 
       if (typeof _value === 'string') {
-        parsedValue = parseInt(_value);
+        parsedValue = parseInt(_value, 10);
       } else {
         parsedValue = _value;
       }
@@ -130,18 +151,38 @@ const Input: React.FC<InputProps> = ({ title, min = 0, max = 255, defaultValue, 
   );
 
   return (
-    <Container onClick={handleContainerClick}>
-      <span>
-        <small>{title}</small>
-        <small>{clientValue}</small>
-      </span>
-      <div>
-        <button type="button" onClick={() => handleChange(defaultValue - 1)}>
-          <FiChevronLeft strokeWidth={5} />
+    <Container hasTitle={!!title} onClick={handleContainerClick}>
+      {title && (
+        <span>
+          <span className="title-text">{title}</span>
+          {clientValue !== undefined && <span className="saved-badge">Saved: {clientValue}</span>}
+        </span>
+      )}
+      <div className="input-controls">
+        <button
+          type="button"
+          onClick={e => {
+            e.stopPropagation();
+            handleChange(defaultValue - 1);
+          }}
+        >
+          <FiChevronLeft size={16} />
         </button>
-        <input type="number" ref={inputRef} value={defaultValue} onChange={e => handleChange(e.target.value)} />
-        <button type="button" onClick={() => handleChange(defaultValue + 1)}>
-          <FiChevronRight strokeWidth={5} />
+        <input
+          type="number"
+          ref={inputRef}
+          value={defaultValue}
+          onWheel={e => (e.target as HTMLElement).blur()}
+          onChange={e => handleChange(e.target.value)}
+        />
+        <button
+          type="button"
+          onClick={e => {
+            e.stopPropagation();
+            handleChange(defaultValue + 1);
+          }}
+        >
+          <FiChevronRight size={16} />
         </button>
       </div>
     </Container>

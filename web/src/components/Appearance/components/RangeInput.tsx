@@ -11,29 +11,65 @@ interface RangeInputProps {
   onChange: (value: number) => void;
 }
 
-const Container = styled.div`
+const Container = styled.div<{ fillPct: number }>`
   width: 100%;
+  margin-top: 6px;
 
   > span {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 11px;
+    font-weight: 600;
     color: var(--spz-dim);
+    margin-bottom: 6px;
 
-    small { font-family: var(--spz-mono); font-size: 10px; }
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .value-pill {
+      font-family: var(--spz-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--spz-accent);
+      background: var(--spz-accent-soft);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--spz-border-hi);
+    }
+
+    .saved-badge {
+      font-family: var(--spz-mono);
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--spz-mute);
+    }
   }
 
-  > div {
+  .slider-wrapper {
     display: flex;
     align-items: center;
     position: relative;
-    margin-top: 9px;
+    height: 32px;
+    padding: 0 4px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--spz-border);
+    border-radius: 7px;
 
     > small {
-      font-size: 8px;
+      font-size: 9px;
+      font-weight: 700;
       color: var(--spz-mute);
       font-family: var(--spz-mono);
+      min-width: 16px;
+      text-align: center;
     }
   }
 
@@ -41,10 +77,15 @@ const Container = styled.div`
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
+    height: 5px;
+    background: linear-gradient(
+      to right,
+      var(--spz-accent) 0%,
+      var(--spz-accent) ${({ fillPct }) => fillPct}%,
+      rgba(255, 255, 255, 0.1) ${({ fillPct }) => fillPct}%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
     outline: none;
-    opacity: 1;
     border-radius: 99px;
     margin: 0 10px;
   }
@@ -52,12 +93,19 @@ const Container = styled.div`
   input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 14px;
-    height: 14px;
-    background: var(--spz-accent);
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
     cursor: pointer;
     border-radius: 50%;
-    box-shadow: 0 0 8px rgba(255, 102, 0, 0.5);
+    border: 2px solid var(--spz-accent);
+    box-shadow: 0 0 10px var(--spz-accent);
+    transition: transform 0.15s, background-color 0.15s;
+  }
+
+  input[type='range']::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background: var(--spz-accent);
   }
 `;
 
@@ -81,21 +129,23 @@ const RangeInput: React.FC<RangeInputProps> = ({
   const handleChange = useCallback(
     (e: { target: { value: string } }) => {
       const parsedValue = parseFloat(e.target.value);
-
       onChange(parsedValue);
     },
     [onChange],
   );
 
+  const fillPct = max > min ? Math.max(0, Math.min(100, ((defaultValue - min) / (max - min)) * 100)) : 0;
+
   return (
-    <Container onClick={handleContainerClick}>
+    <Container fillPct={fillPct} onClick={handleContainerClick}>
       <span>
-        <small>
-          {title}: {defaultValue}
-        </small>
-        <small>{clientValue}</small>
+        <div className="title-group">
+          <span>{title}</span>
+          <span className="value-pill">{defaultValue}</span>
+        </div>
+        {clientValue !== undefined && <span className="saved-badge">Saved: {clientValue}</span>}
       </span>
-      <div>
+      <div className="slider-wrapper">
         <small>{min}</small>
         <input
           type="range"
@@ -104,6 +154,7 @@ const RangeInput: React.FC<RangeInputProps> = ({
           min={min}
           max={max}
           step={factor}
+          onWheel={e => (e.target as HTMLElement).blur()}
           onChange={handleChange}
         />
         <small>{max}</small>

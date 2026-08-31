@@ -20,10 +20,26 @@ const Container = styled.div`
     width: 100%;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 11px;
+    font-weight: 600;
     color: var(--spz-dim);
+    margin-bottom: 6px;
 
-    small { font-family: var(--spz-mono); font-size: 10px; }
+    .title-text {
+      color: var(--spz-text);
+      letter-spacing: 0.02em;
+    }
+
+    .saved-badge {
+      font-family: var(--spz-mono);
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--spz-mute);
+    }
   }
 `;
 
@@ -32,15 +48,14 @@ const PANEL = 'rgba(20, 21, 26, 0.98)';
 const customStyles: any = {
   control: (styles: any, { isFocused }: any) => ({
     ...styles,
-    marginTop: '8px',
-    minHeight: '34px',
-    background: 'rgba(255, 255, 255, 0.03)',
+    minHeight: '36px',
+    background: 'rgba(0, 0, 0, 0.35)',
     fontSize: '13px',
     color: '#f0f0f4',
-    border: `1px solid ${isFocused ? 'rgba(255, 102, 0, 0.5)' : 'rgba(255,255,255,0.1)'}`,
-    borderRadius: '6px',
+    border: `1px solid ${isFocused ? 'rgba(255, 102, 0, 0.5)' : 'rgba(255, 255, 255, 0.08)'}`,
+    borderRadius: '7px',
     outline: 'none',
-    boxShadow: 'none',
+    boxShadow: isFocused ? '0 0 10px rgba(255, 102, 0, 0.15)' : 'none',
     '&:hover': { borderColor: 'rgba(255,255,255,0.2)' },
   }),
   placeholder: (styles: any) => ({ ...styles, fontSize: '13px', color: '#9a9aa5' }),
@@ -48,6 +63,7 @@ const customStyles: any = {
   singleValue: (styles: any) => ({
     ...styles,
     fontSize: '13px',
+    fontWeight: '600',
     color: '#f0f0f4',
     border: 'none',
     outline: 'none',
@@ -58,16 +74,17 @@ const customStyles: any = {
   menu: (styles: any) => ({
     ...styles,
     background: PANEL,
-    border: '1px solid rgba(255,255,255,0.1)',
+    border: '1px solid rgba(255,255,255,0.12)',
     position: 'absolute',
     marginBottom: '10px',
-    borderRadius: '7px',
+    borderRadius: '8px',
     overflow: 'hidden',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
   }),
   menuList: (styles: any) => ({
     ...styles,
     background: PANEL,
-    borderRadius: '7px',
+    borderRadius: '8px',
     padding: '4px',
     '&::-webkit-scrollbar': { width: '6px' },
     '&::-webkit-scrollbar-track': { background: 'none' },
@@ -80,6 +97,7 @@ const customStyles: any = {
     color: isSelected ? '#ff6600' : '#f0f0f4',
     background: isFocused ? 'rgba(255, 102, 0, 0.14)' : 'transparent',
     cursor: 'pointer',
+    fontWeight: isSelected ? '700' : '500',
   }),
 };
 
@@ -95,8 +113,8 @@ const SelectInput = ({ title, items, defaultValue, clientValue, onChange }: Sele
   return (
     <Container>
       <span>
-        <small>{title}</small>
-        <small>{clientValue}</small>
+        <span className="title-text">{title}</span>
+        {clientValue !== undefined && <span className="saved-badge">Saved: {clientValue}</span>}
       </span>
       <Select
         ref={selectRef}

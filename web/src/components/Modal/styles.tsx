@@ -6,6 +6,7 @@ export const Wrapper = styled.div`
   position: absolute;
   left: 0;
   top: 0;
+  z-index: 10000;
 
   display: flex;
   flex-direction: column;
@@ -15,9 +16,9 @@ export const Wrapper = styled.div`
 
   user-select: none;
   text-align: center;
-  background: rgba(6, 7, 9, 0.72);
+  background: rgba(6, 7, 9, 0.8);
+  backdrop-filter: blur(8px);
 
-  /* the content reads as a floating card in the middle */
   p {
     font-size: 20px;
     font-weight: 800;
@@ -30,6 +31,7 @@ export const Wrapper = styled.div`
     font-size: 13px;
     color: var(--spz-dim);
     max-width: 360px;
+    line-height: 1.5;
   }
 `;
 
@@ -38,12 +40,12 @@ export const Buttons = styled.div`
   justify-content: center;
   align-items: center;
   gap: 12px;
-  margin-top: 26px;
+  margin-top: 24px;
 
   button {
     height: 40px;
     min-width: 120px;
-    padding: 0 22px;
+    padding: 0 24px;
 
     display: flex;
     justify-content: center;
@@ -51,26 +53,29 @@ export const Buttons = styled.div`
 
     font-size: 12px;
     font-weight: 800;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     border-radius: 8px;
-    transition: all 0.15s;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid var(--spz-border);
-    background: transparent;
+    background: rgba(255, 255, 255, 0.03);
     color: var(--spz-dim);
+
+    &:hover {
+      color: var(--spz-text);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
   }
 
-  /* accept = primary */
   button:first-child {
-    background: var(--spz-accent);
-    border-color: var(--spz-accent);
-    color: #150a00;
+    background: linear-gradient(135deg, #ff7700 0%, #ff5500 100%);
+    border-color: transparent;
+    color: #120700;
+    box-shadow: 0 4px 14px rgba(255, 102, 0, 0.35);
 
-    &:hover { filter: brightness(1.08); }
-  }
-
-  button:last-child:hover {
-    color: var(--spz-text);
-    border-color: rgba(255, 255, 255, 0.2);
+    &:hover {
+      filter: brightness(1.12);
+      box-shadow: 0 6px 18px rgba(255, 102, 0, 0.5);
+    }
   }
 `;
