@@ -16,8 +16,10 @@ export const Wrapper = styled.div`
 
   user-select: none;
   text-align: center;
+  /* Full-screen over a transparent NUI page, so there is no in-page backdrop to
+     blur — see the Header in ../Appearance/styles.ts. A backdrop-filter here
+     resolved to a solid black screen. */
   background: rgba(6, 7, 9, 0.8);
-  backdrop-filter: blur(8px);
 
   p {
     font-size: 20px;

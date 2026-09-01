@@ -160,6 +160,12 @@ export function registerNuiCallbacks(): void {
   on('__cfx_nui:appearance_change_hair', (hair: PedHair, cb: (arg: any) => void): void => {
     cb({});
     setPedHair(PlayerPedId(), hair);
+    // Hair IS component 2. The preview hold no longer touches it on a freemode
+    // ped (it is owned by this tab, not the clothing tabs), but a NON-freemode
+    // ped is still held component-by-component, so tell the hold about the pick
+    // there — otherwise it restores the seeded style one frame later and the
+    // new one only shows up after saving.
+    trackPreviewComponent({ component_id: 2, drawable: hair.style, texture: 0 });
   });
 
   on('__cfx_nui:appearance_change_eye_color', (eyeColor: number, cb: (arg: any) => void): void => {

@@ -9,7 +9,7 @@ import {
 
 import { pedModels, getPedAppearance, setPlayerAppearance, totalTattoos } from '../../index';
 
-import { arrayToVector3, isPedMale, Delay } from '../../utils';
+import { arrayToVector3, isPedMale, isPedFreemodeModel, Delay } from '../../utils';
 
 import { registerNuiCallbacks } from './nui';
 
@@ -71,8 +71,30 @@ const previewProps: Record<number, { prop_id: number; drawable: number; texture:
 let previewActive = false;
 let previewTick = 0;
 
+// Components 0 (head) and 2 (hair) on a freemode ped are NOT clothing. They are
+// driven by the head blend and the hair tab, and `setPedComponent` already
+// refuses to touch them for exactly that reason.
+//
+// The hold did touch them, and that was the hair bug: pick a new style and
+// `setPedHair` set component 2, then the very next frame this hold compared it
+// against the style seeded when the menu opened, decided it had "drifted", and
+// put the old hair back. The style only ever appeared after saving, because the
+// save path re-applies the whole appearance with the hold already torn down —
+// which is precisely why it looked like the pick had been ignored rather than
+// reverted.
+const HELD_BY_OTHER_TABS = { 0: true, 2: true };
+
+function isHeldElsewhere(ped: number, componentId: number): boolean {
+  return !!HELD_BY_OTHER_TABS[componentId] && isPedFreemodeModel(ped);
+}
+
 function seedPreview(ped: number): void {
   for (const id of PED_COMPONENTS_IDS) {
+    if (isHeldElsewhere(ped, id)) {
+      delete previewComponents[id];
+      continue;
+    }
+
     previewComponents[id] = {
       component_id: id,
       drawable: GetPedDrawableVariation(ped, id),
@@ -655,6 +677,9 @@ function startPlayerCustomization(
 
     for (const id in previewComponents) {
       const c = previewComponents[id];
+      // Belt and braces: a non-freemode ped seeded these legitimately, and a
+      // model swap mid-session can change the answer under us.
+      if (isHeldElsewhere(ped, c.component_id)) continue;
       if (
         GetPedDrawableVariation(ped, c.component_id) !== c.drawable ||
         GetPedTextureVariation(ped, c.component_id) !== c.texture

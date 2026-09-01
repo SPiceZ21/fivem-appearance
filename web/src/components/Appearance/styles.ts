@@ -34,7 +34,11 @@ export const Header = styled.div`
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   flex-shrink: 0;
-  backdrop-filter: blur(12px);
+  /* NO backdrop-filter. Nothing in this page sits behind the header — the game
+     is composited under the whole browser surface, not inside it — so the blur
+     had transparent pixels to filter and CEF resolved them to BLACK. The header
+     rendered as a solid black bar. --spz-panel is already translucent, which is
+     what the blur was reaching for. */
 `;
 
 export const Dot = styled.span`
