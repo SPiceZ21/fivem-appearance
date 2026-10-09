@@ -12,7 +12,9 @@
 /coverage
 
 # production
-/dist
+# web/dist is COMMITTED (the txAdmin recipe clones as-is, no build step).
+# Ignoring it left the hashed assets/*.js out of git while index.html pointed
+# at them, so fresh installs opened a blank appearance editor.
 
 # misc
 .DS_Store
